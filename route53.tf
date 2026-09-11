@@ -24,13 +24,13 @@ resource "aws_route53_zone" "r53_zone" {
 
 # Fetch the NGINX Ingress LoadBalancer service
 data "kubernetes_service" "nginx_ingress" {
-  provider = kubernetes.post_eks  # use the EKS provider alias
+  provider = kubernetes.post_eks # use the EKS provider alias
   metadata {
     name      = "nginx-ingress-${var.environment}-ingress-nginx-controller"
     namespace = "ingress-nginx"
   }
 
-  depends_on = [helm_release.nginx_ingress]  # ensure Helm release is installed
+  depends_on = [helm_release.nginx_ingress] # ensure Helm release is installed
 }
 
 # Route53 record for "bank" subdomain

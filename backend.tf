@@ -6,8 +6,8 @@
 terraform {
   backend "s3" {
     bucket  = "sam-osung-terraform-state-20260911"
-    key     = "bankapp/terraform.tfstate"     # path/file inside the bucket
-    region  = "us-east-1"                     # your AWS region
+    key     = "bankapp/terraform.tfstate" # path/file inside the bucket
+    region  = "us-east-1"                 # your AWS region
     encrypt = true
   }
 }

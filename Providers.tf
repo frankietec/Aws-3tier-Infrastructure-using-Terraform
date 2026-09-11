@@ -6,27 +6,27 @@ terraform {
     }
 
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = ">= 2.0"
     }
 
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = ">= 2.0"
     }
 
 
-}
-        
-    # namecheap = {
-    #   source  = "namecheap/namecheap"
-    # }
   }
+
+  # namecheap = {
+  #   source  = "namecheap/namecheap"
+  # }
+}
 
 
 
 provider "aws" {
-    region = var.aws_region
+  region = var.aws_region
 }
 
 

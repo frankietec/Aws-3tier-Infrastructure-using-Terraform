@@ -18,9 +18,9 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   # Networking
-  vpc_id                    = module.vpc.vpc_id
-  subnet_ids                = module.vpc.private_subnets         # worker node subnets
-  control_plane_subnet_ids  = module.vpc.intra_subnets         # control plane/infra subnets
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = module.vpc.private_subnets # worker node subnets
+  control_plane_subnet_ids = module.vpc.intra_subnets   # control plane/infra subnets
 
   # Explicitly manage core addons
   cluster_addons = {

@@ -28,17 +28,17 @@ resource "aws_iam_role" "rds_pod_role" {
 
 # IAM Policy
 resource "aws_iam_policy" "rds_access" {
-  name   = "RDSAccessPolicy-${var.project_name}-${var.environment}"
+  name = "RDSAccessPolicy-${var.project_name}-${var.environment}"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "rds:DescribeDBInstances",
           "rds-db:connect"
         ]
-        Resource = [aws_db_instance.postgres.arn]  # least privilege
+        Resource = [aws_db_instance.postgres.arn] # least privilege
       }
     ]
   })
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "attach_rds_policy" {
 ########################################################
 
 resource "kubernetes_service_account" "rds_access" {
-  provider = kubernetes.post_eks  # use alias
+  provider = kubernetes.post_eks # use alias
   metadata {
     name      = "rds-access"
     namespace = "default"
@@ -71,7 +71,7 @@ resource "kubernetes_service_account" "rds_access" {
 ########################################################
 
 resource "kubernetes_secret" "rds_credentials" {
-  provider = kubernetes.post_eks  # use alias
+  provider = kubernetes.post_eks # use alias
   metadata {
     name      = "rds-credentials"
     namespace = "default"

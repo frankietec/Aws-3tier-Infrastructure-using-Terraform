@@ -10,7 +10,7 @@ resource "helm_release" "nginx_ingress" {
   namespace        = "ingress-nginx"
   create_namespace = true
   timeout          = 600
-  wait             = true   # Wait for all resources to be ready
+  wait             = true # Wait for all resources to be ready
 
   values = [
     file("nginx-values.yaml")
@@ -140,8 +140,8 @@ resource "helm_release" "argocd" {
 # -------------------------
 resource "null_resource" "apply_argocd_ingress" {
   depends_on = [
-    helm_release.argocd,           # wait for ArgoCD to be installed
-    helm_release.nginx_ingress,    # optional, ensures ingress controller exists
+    helm_release.argocd,        # wait for ArgoCD to be installed
+    helm_release.nginx_ingress, # optional, ensures ingress controller exists
     null_resource.create_cluster_issuer,
   ]
 
