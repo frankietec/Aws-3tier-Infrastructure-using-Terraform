@@ -4,6 +4,8 @@
 
 
 terraform {
+  required_version = ">= 1.5.0"
+
   backend "s3" {
     bucket  = "sam-osung-terraform-state-20260911"
     key     = "bankapp/terraform.tfstate" # path/file inside the bucket

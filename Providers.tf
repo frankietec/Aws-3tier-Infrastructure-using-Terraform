@@ -15,7 +15,15 @@ terraform {
       version = ">= 2.0"
     }
 
+    local = {
+      source  = "hashicorp/local"
+      version = ">= 2.0"
+    }
 
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.0"
+    }
   }
 
   # namecheap = {
@@ -81,5 +89,4 @@ provider "helm" {
     token                  = data.aws_eks_cluster_auth.cluster.token
   }
 }
-
 

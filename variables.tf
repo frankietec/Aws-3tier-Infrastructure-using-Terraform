@@ -89,28 +89,7 @@ variable "rds_port" {
 ############################################
 # Route53 & Namecheap Variables
 ############################################
-variable "namecheap_api_user" {
-  description = "Namecheap API user"
-  type        = string
-}
-
-variable "namecheap_api_key" {
-  description = "Namecheap API key"
-  type        = string
-  sensitive   = true
-}
-
-variable "namecheap_username" {
-  description = "Namecheap Username"
-  type        = string
-}
-
 variable "namecheap_domain" {
   description = "Domain name registered on Namecheap"
-  type        = string
-}
-
-variable "letsencrypt_email" {
-  description = "Email for Letsencrypt"
   type        = string
 }

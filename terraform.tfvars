@@ -37,10 +37,4 @@ rds_port              = 5432
 
 
 # Route53 / Namecheap
-namecheap_api_user = "your_api_user"
-namecheap_api_key  = "your_api_key"
-namecheap_username = "sammyosung"
-namecheap_domain   = "samone.store"
-
-#Lestencrpt email in Clusterissuer
-letsencrypt_email = "osung996@gmailcom"
+namecheap_domain = "samone.store"
