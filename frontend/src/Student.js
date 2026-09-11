@@ -1,6 +1,6 @@
 // Student.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Student.css';
 
 function Student() {
@@ -14,19 +14,19 @@ function Student() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   console.log("API",API_BASE_URL)
-const getData=()=> {
-  fetch(`${API_BASE_URL}/student`)
-  .then((res) => res.json())
-  .then((data) => {
-    console.log('Fetched Data:', data);
-    setData(data);
-  })
-  .catch((err) => console.log(err));
-}
+  const getData = useCallback(() => {
+    fetch(`${API_BASE_URL}/student`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('Fetched Data:', data);
+        setData(data);
+      })
+      .catch((err) => console.log(err));
+  }, [API_BASE_URL]);
 
   useEffect(() => {
-    getData()
-  }, []); 
+    getData();
+  }, [getData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
