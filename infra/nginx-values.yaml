@@ -1,0 +1,12 @@
+# Minimal values file for ingress-nginx Helm chart
+controller:
+  service:
+    type: LoadBalancer
+
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+
+  publishService:
+    enabled: true
