@@ -51,6 +51,14 @@ jobs:
         working-directory: backend
         run: npm ci
 
+      - name: Lint backend
+        working-directory: backend
+        run: npm run lint
+
+      - name: Test backend
+        working-directory: backend
+        run: npm test
+
       - name: Log in to ECR
         run: |
           aws ecr get-login-password --region "$AWS_REGION" |
