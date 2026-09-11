@@ -2,7 +2,7 @@
 FROM node:21-alpine3.17 as build
 WORKDIR /app
 COPY . .
-RUN npm install
+RUN npm ci
 RUN npm run build
 
 # Stage 2: Use Nginx to serve the frontend content

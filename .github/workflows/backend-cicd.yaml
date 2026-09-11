@@ -9,9 +9,16 @@ on:
       - ".github/workflows/backend-cicd.yaml"
   workflow_dispatch:
     inputs:
+      action:
+        description: Choose whether to build/push or update the manifest
+        required: true
+        type: choice
+        options:
+          - build
+          - update-manifest
       image_tag:
         description: ECR image tag to update in the backend manifest
-        required: true
+        required: false
         type: string
 
 permissions:
@@ -26,7 +33,7 @@ env:
 
 jobs:
   build-and-push:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || inputs.action == 'build'
     runs-on: ubuntu-latest
 
     steps:
@@ -58,7 +65,7 @@ jobs:
           docker push "$ECR_REPOSITORY:$IMAGE_TAG"
 
   update-manifest:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'update-manifest'
     runs-on: ubuntu-latest
 
     steps:
@@ -69,8 +76,8 @@ jobs:
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
+          test -n "$IMAGE_TAG"
           sed -i -E "s|^        image: .*|        image: ${ECR_REPOSITORY}:${IMAGE_TAG}|" "$MANIFEST_FILE"
-          git diff --exit-code -- "$MANIFEST_FILE" || true
 
       - name: Commit manifest update
         env:
