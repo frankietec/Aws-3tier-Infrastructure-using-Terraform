@@ -1,5 +1,5 @@
-resource "aws_ecr_repository" "bank_frontend" {
-  name = "${var.environment}-bankfrontend"
+resource "aws_ecr_repository" "frontend" {
+  name = "${var.environment}-frontend"
 
   image_tag_mutability = "MUTABLE"
 
@@ -8,8 +8,8 @@ resource "aws_ecr_repository" "bank_frontend" {
   }
 }
 
-resource "aws_ecr_repository" "bank_backend_api" {
-  name = "${var.environment}-bankbackendapi"
+resource "aws_ecr_repository" "backend" {
+  name = "${var.environment}-backend"
 
   image_tag_mutability = "MUTABLE"
 

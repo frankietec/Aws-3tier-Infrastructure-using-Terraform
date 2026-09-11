@@ -14,7 +14,7 @@ module "eks" {
 
   # Cluster identity
   cluster_name                   = "${var.project_name}-${var.environment}-cluster"
-  cluster_version                = "1.30"
+  cluster_version                = "1.35"
   cluster_endpoint_public_access = true
 
   # Networking
@@ -37,4 +37,3 @@ module "eks" {
     Env     = var.environment
   }
 }
-

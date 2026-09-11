@@ -20,9 +20,9 @@ eks_node_groups = {
     desired_size   = 4
     max_size       = 6
     min_size       = 3
-    instance_types = ["t3.large"]
+    instance_types = ["t3.small"]
     capacity_type  = "ON_DEMAND"
-    key_name       = "cicd" #your desired key
+    ami_type       = "AL2023_x86_64_STANDARD"
   }
 }
 

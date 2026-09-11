@@ -62,12 +62,12 @@ output "route53_nameservers" {
 
 
 # ECR
-output "bankfrontend_ecr_url" {
-  value = aws_ecr_repository.bank_frontend.repository_url
+output "frontend_ecr_url" {
+  value = aws_ecr_repository.frontend.repository_url
 }
 
-output "bankbackendapi_ecr_url" {
-  value = aws_ecr_repository.bank_backend_api.repository_url
+output "backend_ecr_url" {
+  value = aws_ecr_repository.backend.repository_url
 }
 
 #Check whether cluster-issuer is ready
@@ -79,4 +79,3 @@ output "bank_subdomain_full_record" {
   value       = aws_route53_record.bank
   description = "Full Route53 record object for 'bank' subdomain"
 }
-
