@@ -1,5 +1,6 @@
 resource "aws_ecr_repository" "frontend" {
-  name = "${var.environment}-frontend"
+  name         = "${var.environment}-frontend"
+  force_delete = true
 
   image_tag_mutability = "MUTABLE"
 
@@ -9,7 +10,8 @@ resource "aws_ecr_repository" "frontend" {
 }
 
 resource "aws_ecr_repository" "backend" {
-  name = "${var.environment}-backend"
+  name         = "${var.environment}-backend"
+  force_delete = true
 
   image_tag_mutability = "MUTABLE"
 

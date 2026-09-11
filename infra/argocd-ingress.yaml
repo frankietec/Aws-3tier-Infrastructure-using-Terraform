@@ -12,10 +12,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - argocd.samone.store
+    - argocd.joybassey.online
     secretName: argocd-tls
   rules:
-  - host: argocd.samone.store
+  - host: argocd.joybassey.online
     http:
       paths:
       - path: /
