@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-migration
+spec:
+  backoffLimit: 4
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: mysql-migration
+          image: mysql:8.0
+          envFrom:
+            - secretRef:
+                name: mysql-secret
+            - configMapRef:
+                name: mysql-config
+          volumeMounts:
+            - name: migration-script
+              mountPath: /migrations
+              readOnly: true
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              until mysqladmin ping \
+                --host=mysql \
+                --user=root \
+                --password="$MYSQL_ROOT_PASSWORD" \
+                --silent; do
+                echo "Waiting for MySQL..."
+                sleep 5
+              done
+
+              mysql \
+                --host=mysql \
+                --user=root \
+                --password="$MYSQL_ROOT_PASSWORD" \
+                "$MYSQL_DATABASE" < /migrations/init.sql
+      volumes:
+        - name: migration-script
+          configMap:
+            name: mysql-migration-script
