@@ -18,6 +18,7 @@ Terraform provisions:
 
 - A VPC with public, private, and intra subnets.
 - An EKS 1.35 cluster with `t3.small` managed worker nodes.
+- The AWS EBS CSI managed add-on, configured with IRSA and an encrypted `gp3` StorageClass.
 - Amazon Linux 2023 worker AMIs with On-Demand capacity.
 - An RDS PostgreSQL instance in private subnets.
 - ECR repositories:
@@ -90,7 +91,19 @@ aws eks update-kubeconfig \
   --region us-east-1 \
   --name bank-app-dev-cluster
 kubectl get nodes
+aws eks describe-addon \
+  --cluster-name bank-app-dev-cluster \
+  --addon-name aws-ebs-csi-driver \
+  --region us-east-1
+
+terraform output eks_oidc_provider_arn
+terraform output eks_oidc_issuer_url
 ```
+
+Terraform creates the EBS CSI add-on after the cluster and its OIDC provider
+are ready. The add-on uses the `AmazonEBSCSIDriverPolicy` through a dedicated
+IRSA role; no `eksctl create addon` step is required. The `gp3` StorageClass
+is created by Terraform and is used by the MySQL StatefulSet.
 
 ## Deploy Kubernetes manifests
 

@@ -16,6 +16,7 @@ module "eks" {
   cluster_name                   = "${var.project_name}-${var.environment}-cluster"
   cluster_version                = "1.35"
   cluster_endpoint_public_access = true
+  enable_irsa                    = true
 
   # Networking
   vpc_id                   = module.vpc.vpc_id

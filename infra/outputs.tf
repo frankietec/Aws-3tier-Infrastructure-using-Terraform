@@ -11,6 +11,16 @@ output "eks_cluster_endpoint" {
   value       = module.eks.cluster_endpoint
 }
 
+output "eks_oidc_provider_arn" {
+  description = "IAM OIDC provider ARN used by IRSA"
+  value       = module.eks.oidc_provider_arn
+}
+
+output "eks_oidc_issuer_url" {
+  description = "EKS OIDC issuer URL"
+  value       = module.eks.cluster_oidc_issuer_url
+}
+
 # RDS
 output "rds_endpoint" {
   description = "RDS endpoint for connecting applications"
