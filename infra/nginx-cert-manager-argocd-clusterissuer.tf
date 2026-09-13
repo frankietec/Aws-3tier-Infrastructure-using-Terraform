@@ -134,6 +134,39 @@ resource "helm_release" "argocd" {
   ]
 }
 
+# -------------------------
+# kube-prometheus-stack via Helm
+# -------------------------
+resource "helm_release" "kube_prometheus_stack" {
+  provider         = helm
+  name             = "prometheus"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  version          = "70.4.1"
+  namespace        = "monitoring"
+  create_namespace = true
+  timeout          = 900
+  wait             = true
+  atomic           = true
+
+  values = [
+    file("${path.module}/kube-prometheus-stack-values.yaml")
+  ]
+
+  set_sensitive = [
+    {
+      name  = "grafana.adminPassword"
+      value = random_password.grafana_admin.result
+    }
+  ]
+
+  depends_on = [
+    helm_release.nginx_ingress,
+    null_resource.create_cluster_issuer,
+    kubernetes_storage_class_v1.ebs_gp3,
+  ]
+}
+
 
 # -------------------------
 # Apply Argocd-ingress

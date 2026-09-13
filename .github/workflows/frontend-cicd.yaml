@@ -25,6 +25,7 @@ env:
   AWS_REGION: us-east-1
   IMAGE_NAME: frontend
   MANIFEST_FILE: app-manifests/frontend-deployment.yaml
+  REACT_APP_API_BASE_URL: https://api.joybassey.online
 
 jobs:
   build-and-push:
@@ -64,7 +65,9 @@ jobs:
         env:
           IMAGE_TAG: frontend-${{ github.run_number }}
         run: |
-          docker build -t "$IMAGE_NAME:$IMAGE_TAG" frontend
+          docker build \
+            --build-arg REACT_APP_API_BASE_URL="$REACT_APP_API_BASE_URL" \
+            -t "$IMAGE_NAME:$IMAGE_TAG" frontend
           docker tag "$IMAGE_NAME:$IMAGE_TAG" "$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REPOSITORY:$IMAGE_TAG"
 

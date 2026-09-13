@@ -20,7 +20,7 @@ spec:
           - containerPort: 3500
         env:
           - name: CORS_ORIGINS
-            value: https://joybassey.online
+            value: "*"
 
           - name: MYSQL_HOST
             value: mysql

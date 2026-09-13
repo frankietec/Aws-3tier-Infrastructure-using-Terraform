@@ -65,3 +65,17 @@ resource "aws_route53_record" "argocd" {
 
   depends_on = [data.kubernetes_service.nginx_ingress]
 }
+
+# Route53 record for Grafana, which is served by the shared NGINX ingress LB.
+resource "aws_route53_record" "grafana" {
+  zone_id = aws_route53_zone.r53_zone.zone_id
+  name    = "grafana.${var.namecheap_domain}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+
+  depends_on = [
+    data.kubernetes_service.nginx_ingress,
+    helm_release.kube_prometheus_stack,
+  ]
+}

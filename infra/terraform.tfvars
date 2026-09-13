@@ -20,7 +20,7 @@ eks_node_groups = {
     desired_size   = 4
     max_size       = 6
     min_size       = 3
-    instance_types = ["t3.small"]
+    instance_types = ["c7i-flex.large"]
     capacity_type  = "ON_DEMAND"
     ami_type       = "AL2023_x86_64_STANDARD"
   }

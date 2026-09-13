@@ -17,14 +17,17 @@ app-manifests/         Kubernetes application, database, ingress, and TLS manife
 Terraform provisions:
 
 - A VPC with public, private, and intra subnets.
-- An EKS 1.35 cluster with `t3.small` managed worker nodes.
+- An EKS 1.35 cluster with `c7i-flex.large` managed worker nodes.
 - The AWS EBS CSI managed add-on, configured with IRSA and an encrypted `gp3` StorageClass.
 - Amazon Linux 2023 worker AMIs with On-Demand capacity.
 - An RDS PostgreSQL instance in private subnets.
 - ECR repositories:
   - `dev-frontend`
   - `dev-backend`
-- NGINX Ingress, cert-manager, and Argo CD through Helm.
+- NGINX Ingress, cert-manager, and Argo CD through Helm. Argo CD is the
+  deployment controller for the application manifests.
+- kube-prometheus-stack through Helm, with persistent gp3 storage and Grafana
+  exposed through NGINX Ingress.
 - Route 53 records for `joybassey.online`.
 
 The application ingress uses:
@@ -33,6 +36,7 @@ The application ingress uses:
 https://joybassey.online       Frontend
 https://api.joybassey.online   Backend
 https://argocd.joybassey.online Argo CD
+https://grafana.joybassey.online Grafana
 ```
 
 ## Prerequisites
@@ -105,36 +109,59 @@ are ready. The add-on uses the `AmazonEBSCSIDriverPolicy` through a dedicated
 IRSA role; no `eksctl create addon` step is required. The `gp3` StorageClass
 is created by Terraform and is used by the MySQL StatefulSet.
 
-## Deploy Kubernetes manifests
-
-Apply the shared platform and application manifests after the cluster is ready:
+Terraform also installs the Prometheus community `kube-prometheus-stack` chart
+in the `monitoring` namespace. Grafana uses the shared NGINX ingress and the
+existing cert-manager `http-01-production` ClusterIssuer; Prometheus,
+Alertmanager, and Grafana data are persisted on the encrypted `gp3`
+StorageClass. Terraform generates the Grafana admin password and Helm stores
+it in the `monitoring` namespace:
 
 ```bash
-kubectl apply -f app-manifests/secret.yaml
-kubectl apply -f app-manifests/configmap.yaml
-kubectl apply -f app-manifests/mysql-migration-script.yaml
-kubectl apply -f app-manifests/mysql-service.yaml
-kubectl apply -f app-manifests/mysql-statefulsets.yaml
-kubectl apply -f app-manifests/mysql-migration-job.yaml
-kubectl apply -f app-manifests/backend-service.yaml
-kubectl apply -f app-manifests/backend-deployment.yaml
-kubectl apply -f app-manifests/front-service.yaml
-kubectl apply -f app-manifests/frontend-deployment.yaml
-kubectl apply -f app-manifests/certificate.yaml
-kubectl apply -f app-manifests/ingress.yaml
+kubectl get secret prometheus-grafana -n monitoring \
+  -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
 
-The MySQL migration is a one-shot Job. It waits for the `mysql` service, reads the password from `mysql-secret`, reads the database name from `mysql-config`, and executes the SQL in the migration ConfigMap.
+## Deploy the application with Argo CD
 
-Check it with:
+Terraform installs and configures Argo CD in the `argocd` namespace, including
+the TLS-protected Argo CD Ingress at
+`https://argocd.joybassey.online`. Application resources under
+`app-manifests/` are intended to be delivered through Argo CD, not applied
+individually with `kubectl`.
+
+After Terraform has completed:
+
+1. Open Argo CD at `https://argocd.joybassey.online`.
+2. Create or update the Argo CD Application to use this repository as its
+   source, with `app-manifests/` as the path and the target EKS cluster and
+   namespace configured for the application.
+3. Enable automated sync and pruning if that is the desired environment
+   policy.
+4. Sync the application from the Argo CD UI or CLI.
+
+The application CI/CD workflows build and publish frontend and backend images.
+The `update-manifest` workflow then updates the image references in
+`app-manifests/frontend-deployment.yaml` and
+`app-manifests/backend-deployment.yaml`. Argo CD detects those Git changes and
+reconciles the workloads into the cluster.
+
+For this learning environment, the backend manifest sets `CORS_ORIGINS=*` so
+students can connect to the API from different frontend hosts. Restrict this
+value to trusted frontend origins before using the deployment for production.
+
+The MySQL migration is represented by a one-shot Job in the application
+manifests. It waits for the `mysql` service, reads the password from
+`mysql-secret`, reads the database name from `mysql-config`, and executes the
+SQL in the migration ConfigMap. For a new schema migration, use a new Job name
+such as `mysql-migration-v2`; completed Jobs do not automatically run again.
+
+Use `kubectl` for read-only operational checks:
 
 ```bash
 kubectl get pods
 kubectl get job mysql-migration
 kubectl logs job/mysql-migration
 ```
-
-For a new schema migration, use a new Job name such as `mysql-migration-v2`; completed Jobs do not automatically run again.
 
 ## Application CI/CD
 
@@ -246,7 +273,7 @@ The workflow must authenticate AWS first and derive an ECR repository from `aws 
 Confirm [infra/EKS.tf](./infra/EKS.tf) uses EKS 1.35 and [infra/terraform.tfvars](./infra/terraform.tfvars) contains:
 
 ```hcl
-instance_types = ["t3.small"]
+instance_types = ["c7i-flex.large"]
 capacity_type  = "ON_DEMAND"
 ami_type       = "AL2023_x86_64_STANDARD"
 ```

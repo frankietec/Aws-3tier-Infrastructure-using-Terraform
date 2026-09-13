@@ -1,0 +1,50 @@
+# Values for kube-prometheus-stack.
+#
+# Grafana is exposed through the existing NGINX ingress controller. Prometheus
+# and Alertmanager remain cluster-internal and use the Terraform-managed gp3
+# StorageClass provided by the EBS CSI add-on.
+grafana:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: http-01-production
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    hosts:
+      - grafana.joybassey.online
+    path: /
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.joybassey.online
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
