@@ -33,21 +33,30 @@ data "kubernetes_service" "nginx_ingress" {
   depends_on = [helm_release.nginx_ingress] # ensure Helm release is installed
 }
 
-# Route53 record for "bank" subdomain
-resource "aws_route53_record" "bank" {
+# Get the regional hosted zone ID required for an ELB alias record.
+data "aws_lb_hosted_zone_id" "nginx_ingress" {
+  load_balancer_type = "application"
+}
+
+# Route53 record for the root domain
+resource "aws_route53_record" "root" {
   zone_id = aws_route53_zone.r53_zone.zone_id
-  name    = "bank.${var.namecheap_domain}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+  name    = var.namecheap_domain
+  type    = "A"
+
+  alias {
+    name                   = data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname
+    zone_id                = data.aws_lb_hosted_zone_id.nginx_ingress.id
+    evaluate_target_health = true
+  }
 
   depends_on = [data.kubernetes_service.nginx_ingress]
 }
 
-# Route53 record for "bankapi" subdomain
-resource "aws_route53_record" "bankapi" {
+# Route53 record for "api" subdomain
+resource "aws_route53_record" "api" {
   zone_id = aws_route53_zone.r53_zone.zone_id
-  name    = "bankapi.${var.namecheap_domain}"
+  name    = "api.${var.namecheap_domain}"
   type    = "CNAME"
   ttl     = 300
   records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
@@ -78,4 +87,14 @@ resource "aws_route53_record" "grafana" {
     data.kubernetes_service.nginx_ingress,
     helm_release.kube_prometheus_stack,
   ]
+}
+
+moved {
+  from = aws_route53_record.bank
+  to   = aws_route53_record.root
+}
+
+moved {
+  from = aws_route53_record.bankapi
+  to   = aws_route53_record.api
 }

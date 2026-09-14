@@ -84,8 +84,8 @@ output "backend_ecr_url" {
 
 
 
-#R53 Records
-output "bank_subdomain_full_record" {
-  value       = aws_route53_record.bank
-  description = "Full Route53 record object for 'bank' subdomain"
+# R53 Records
+output "root_domain_full_record" {
+  value       = aws_route53_record.root
+  description = "Full Route53 record object for the root domain"
 }
