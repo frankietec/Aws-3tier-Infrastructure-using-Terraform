@@ -8,7 +8,8 @@ terraform {
 
   backend "s3" {
     bucket  = "sam-osung-terraform-state-20260911"
-    key     = "bankapp/terraform.tfstate" # path/file inside the bucket
+    # Keep this key stable so Terraform continues using the existing state.
+    key     = "bankapp/terraform.tfstate" # legacy state path; do not rename without migrating state
     region  = "us-east-1"                 # your AWS region
     encrypt = true
   }

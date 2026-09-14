@@ -93,10 +93,10 @@ After EKS is created, configure kubectl:
 ```bash
 aws eks update-kubeconfig \
   --region us-east-1 \
-  --name bank-app-dev-cluster
+  --name joybassey-app-dev-cluster
 kubectl get nodes
 aws eks describe-addon \
-  --cluster-name bank-app-dev-cluster \
+  --cluster-name joybassey-app-dev-cluster \
   --addon-name aws-ebs-csi-driver \
   --region us-east-1
 
