@@ -66,7 +66,7 @@ getData()})
     <div>
     <div className="student-container">
       <div className="content">
-        <h2 className='store-student-details'style={{ marginLeft: '100px' }}>Student Details</h2>
+        <h2 className='store-student-details'style={{ marginLeft: '100px' }}>Student Informations</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Name:</label>
@@ -105,7 +105,7 @@ getData()})
         </form>
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '50px 0' }}>
-      <h2 className='student-details'>Student details</h2>
+      <h2 className='student-details'>Student informations</h2>
       <table className="student-table gradient-bg" style={{ border: '1px solid #ccc', borderCollapse: 'collapse', margin: '100px 0',marginLeft: '800px', marginTop: '200px', width: '40%', backgroundColor: '#f4f4f4'}}>
         <thead>
           <tr style={{ backgroundColor: '#ddd' }}>
