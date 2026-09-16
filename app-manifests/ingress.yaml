@@ -7,12 +7,12 @@ metadata:
 spec:
   tls:
   - hosts:
-    - joybassey.online
-    - api.joybassey.online
+    - fkvr.xyz
+    - api.fkvr.xyz
     secretName: frontend-tls-secret
   rules:
     # Frontend
-    - host: joybassey.online
+    - host: fkvr.xyz
       http:
         paths:
         - path: /
