@@ -24,7 +24,7 @@ spec:
                 number: 80
 
     # Backend
-    - host: api.joybassey.online
+    - host: api.fkvr.xyz
       http:
         paths:
         - path: /
