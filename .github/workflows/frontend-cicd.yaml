@@ -25,7 +25,7 @@ env:
   AWS_REGION: us-east-1
   IMAGE_NAME: frontend
   MANIFEST_FILE: app-manifests/frontend-deployment.yaml
-  REACT_APP_API_BASE_URL: https://api.joybassey.online
+  REACT_APP_API_BASE_URL: https://api.fkvr.xyz
 
 jobs:
   build-and-push:
