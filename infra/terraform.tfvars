@@ -37,4 +37,4 @@ rds_port              = 5432
 
 
 # Route53 / Namecheap
-namecheap_domain = "joybassey.online"
+namecheap_domain = "fkvr.xyz"
