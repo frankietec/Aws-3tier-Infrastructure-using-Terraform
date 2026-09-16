@@ -7,7 +7,7 @@ terraform {
   required_version = ">= 1.5.0"
 
   backend "s3" {
-    bucket = "sam-osung-terraform-state-20260911"
+    bucket = "3infra-bucket"
     # Keep this key stable so Terraform continues using the existing state.
     key     = "bankapp/terraform.tfstate" # legacy state path; do not rename without migrating state
     region  = "us-east-1"                 # your AWS region
