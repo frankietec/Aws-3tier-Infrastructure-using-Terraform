@@ -11,12 +11,12 @@ grafana:
       cert-manager.io/cluster-issuer: http-01-production
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     hosts:
-      - grafana.joybassey.online
+      - grafana.fkvr.xyz 
     path: /
     tls:
       - secretName: grafana-tls
         hosts:
-          - grafana.joybassey.online
+          - grafana.fkvr.xyz
   persistence:
     enabled: true
     storageClassName: gp3

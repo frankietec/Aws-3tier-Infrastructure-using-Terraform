@@ -28,15 +28,15 @@ Terraform provisions:
   deployment controller for the application manifests.
 - kube-prometheus-stack through Helm, with persistent gp3 storage and Grafana
   exposed through NGINX Ingress.
-- Route 53 records for `joybassey.online`.
+- Route 53 records for `fkvr.xyz`.
 
 The application ingress uses:
 
 ```text
-https://joybassey.online       Frontend
-https://api.joybassey.online   Backend
-https://argocd.joybassey.online Argo CD
-https://grafana.joybassey.online Grafana
+https://fkvr.xyz        Frontend
+https://api.fkvr.xyz    Backend
+https://argocd.fkvr.xyz  Argo CD
+https://grafana.fkvr.xyz  Grafana
 ```
 
 ## Prerequisites
@@ -60,7 +60,7 @@ The bucket must exist before Terraform initialization:
 
 ```bash
 aws s3api head-bucket \
-  --bucket sam-osung-terraform-state-20260911 \
+  --bucket 3infra-bucket \
   --region us-east-1
 ```
 
@@ -93,10 +93,10 @@ After EKS is created, configure kubectl:
 ```bash
 aws eks update-kubeconfig \
   --region us-east-1 \
-  --name joybassey-app-dev-cluster
+  --name fkvr-app-dev-cluster
 kubectl get nodes
 aws eks describe-addon \
-  --cluster-name joybassey-app-dev-cluster \
+  --cluster-name fkvr-app-dev-cluster \
   --addon-name aws-ebs-csi-driver \
   --region us-east-1
 
@@ -125,13 +125,13 @@ kubectl get secret prometheus-grafana -n monitoring \
 
 Terraform installs and configures Argo CD in the `argocd` namespace, including
 the TLS-protected Argo CD Ingress at
-`https://argocd.joybassey.online`. Application resources under
+`https://argocd.fkvr.xyz`. Application resources under
 `app-manifests/` are intended to be delivered through Argo CD, not applied
 individually with `kubectl`.
 
 After Terraform has completed:
 
-1. Open Argo CD at `https://argocd.joybassey.online`.
+1. Open Argo CD at `https://argocd.fkvr.xyz`.
 2. Create or update the Argo CD Application to use this repository as its
    source, with `app-manifests/` as the path and the target EKS cluster and
    namespace configured for the application.
