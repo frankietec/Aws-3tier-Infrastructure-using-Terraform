@@ -13,15 +13,15 @@ module "eks" {
   subnet_ids               = module.vpc.private_subnets # worker node subnets
   control_plane_subnet_ids = module.vpc.intra_subnets   # control plane/infra subnets
 
-  # Security Group Rules: Allow all node-to-node traffic for CNI pod networking
+  # Security Group Rules: Allow all node-to-node and pod-to-pod traffic across subnets
   node_security_group_additional_rules = {
-    ingress_self_all = {
-      description = "Allow all node to node traffic across all ports"
+    ingress_cluster_cni = {
+      description = "Allow all intra-cluster node and pod traffic across VPC subnets"
       protocol    = "-1"
       from_port   = 0
       to_port     = 0
       type        = "ingress"
-      self        = true
+      cidr_blocks = [module.vpc.vpc_cidr_block]
     }
   }
 
