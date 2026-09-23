@@ -59,7 +59,7 @@ provider "kubernetes" {
 
 # Aliased Kubernetes Provider for post-EKS resources.
 provider "kubernetes" {
-  alias      = "post_eks"
+  alias       = "post_eks"
   config_path = pathexpand("~/.kube/config")
 }
 
