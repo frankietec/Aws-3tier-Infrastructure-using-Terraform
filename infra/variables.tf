@@ -15,6 +15,25 @@ variable "environment" {
   type        = string
 }
 
+variable "kubernetes_host" {
+  description = "EKS API server endpoint used for Kubernetes and Helm providers. Provide only in the post-cluster phase."
+  type        = string
+  default     = ""
+}
+
+variable "kubernetes_cluster_ca_certificate" {
+  description = "Base64-encoded cluster CA certificate for the Kubernetes provider. Provide only in the post-cluster phase."
+  type        = string
+  default     = ""
+}
+
+variable "kubernetes_token" {
+  description = "Bearer token for the Kubernetes provider. Provide only in the post-cluster phase."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 ############################################
 # VPC Variables
 ############################################
