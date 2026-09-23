@@ -32,6 +32,12 @@ module "eks" {
     vpc-cni    = { most_recent = true }
   }
 
+  # Avoid managing the aws-auth configmap with the Kubernetes provider here.
+  # The provider is configured separately in Providers.tf and the EKS module
+  # should not create a second Kubernetes dependency cycle in CI.
+  manage_aws_auth_configmap = false
+  create_aws_auth_configmap = false
+
   # Node groups defined by variable
   eks_managed_node_groups = var.eks_node_groups
 

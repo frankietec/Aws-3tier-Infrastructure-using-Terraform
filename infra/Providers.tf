@@ -36,38 +36,36 @@ provider "aws" {
   region = var.aws_region
 }
 
-# EKS data sources
+# These data sources are still required for generated kubeconfig and other EKS-aware resources.
+# They are not used in provider configuration, which avoids the Terraform cycle.
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
 
-  depends_on = [
-    module.eks
-  ]
+  depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 
-  depends_on = [
-    module.eks
-  ]
+  depends_on = [module.eks]
 }
 
-# Keep an aliased Kubernetes provider for resources that are created after the cluster exists.
-# The default kubernetes provider is intentionally omitted to avoid a circular dependency with
-# the terraform-aws-modules/eks module's aws-auth configmap management.
+# Use the local kubeconfig for the EKS cluster instead of deriving the provider
+# endpoint from module.eks. This avoids a circular dependency between the EKS
+# module's aws-auth resources and the Kubernetes provider.
 provider "kubernetes" {
-  alias                  = "post_eks"
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
+  config_path = pathexpand("~/.kube/config")
 }
 
-# Helm Provider using EKS credentials
+# Aliased Kubernetes Provider for post-EKS resources.
+provider "kubernetes" {
+  alias      = "post_eks"
+  config_path = pathexpand("~/.kube/config")
+}
+
+# Helm Provider using the same kubeconfig context.
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.cluster.token
+    config_path = pathexpand("~/.kube/config")
   }
 }

@@ -61,6 +61,12 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Configure kubectl context
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ secrets.EKS_CLUSTER_NAME }}" \
+            --region "${{ secrets.AWS_REGION }}"
+
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
@@ -113,6 +119,12 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Configure kubectl context
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ secrets.EKS_CLUSTER_NAME }}" \
+            --region "${{ secrets.AWS_REGION }}"
+
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
@@ -146,6 +158,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+
+      - name: Configure kubectl context
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ secrets.EKS_CLUSTER_NAME }}" \
+            --region "${{ secrets.AWS_REGION }}"
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
