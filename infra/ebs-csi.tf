@@ -61,6 +61,7 @@ resource "aws_eks_addon" "ebs_csi_driver" {
 # Use a CSI-backed gp3 class explicitly rather than relying on the legacy
 # in-tree gp2 default.
 resource "kubernetes_storage_class_v1" "ebs_gp3" {
+  count    = var.deploy_kubernetes_resources ? 1 : 0
   provider = kubernetes.post_eks
 
   metadata {

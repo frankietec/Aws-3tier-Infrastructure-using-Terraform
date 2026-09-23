@@ -2,6 +2,7 @@
 # NGINX Ingress via Helm
 # -------------------------
 resource "helm_release" "nginx_ingress" {
+  count            = var.deploy_kubernetes_resources ? 1 : 0
   provider         = helm
   name             = "nginx-ingress-${var.environment}"
   repository       = "https://kubernetes.github.io/ingress-nginx"
@@ -23,6 +24,7 @@ resource "helm_release" "nginx_ingress" {
 # Wait for NGINX webhook secret and patch job
 # -------------------------
 resource "null_resource" "wait_for_nginx_webhook" {
+  count      = var.deploy_kubernetes_resources ? 1 : 0
   depends_on = [helm_release.nginx_ingress]
 
   provisioner "local-exec" {
@@ -46,6 +48,7 @@ EOT
 # Cert-Manager via Helm
 # -------------------------
 resource "helm_release" "cert_manager" {
+  count            = var.deploy_kubernetes_resources ? 1 : 0
   provider         = helm
   name             = "cert-manager-${var.environment}"
   repository       = "https://charts.jetstack.io"
@@ -67,6 +70,7 @@ resource "helm_release" "cert_manager" {
 # Kubeconfig for local-exec
 # -------------------------
 resource "local_file" "kubeconfig" {
+  count    = var.deploy_kubernetes_resources ? 1 : 0
   filename = "${path.module}/kubeconfig"
 
   depends_on = [module.eks]
@@ -96,6 +100,7 @@ EOF
 # Apply ClusterIssuer
 # -------------------------
 resource "null_resource" "create_cluster_issuer" {
+  count = var.deploy_kubernetes_resources ? 1 : 0
   depends_on = [
     helm_release.cert_manager,
     local_file.kubeconfig
@@ -103,7 +108,7 @@ resource "null_resource" "create_cluster_issuer" {
 
   provisioner "local-exec" {
     environment = {
-      KUBECONFIG = local_file.kubeconfig.filename
+      KUBECONFIG = local_file.kubeconfig[0].filename
     }
 
     command = "kubectl apply -f cluster-issuer.yaml"
@@ -114,6 +119,7 @@ resource "null_resource" "create_cluster_issuer" {
 # ArgoCD via Helm
 # -------------------------
 resource "helm_release" "argocd" {
+  count            = var.deploy_kubernetes_resources ? 1 : 0
   provider         = helm
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
@@ -138,6 +144,7 @@ resource "helm_release" "argocd" {
 # kube-prometheus-stack via Helm
 # -------------------------
 resource "helm_release" "kube_prometheus_stack" {
+  count            = var.deploy_kubernetes_resources ? 1 : 0
   provider         = helm
   name             = "prometheus"
   repository       = "https://prometheus-community.github.io/helm-charts"
@@ -172,6 +179,7 @@ resource "helm_release" "kube_prometheus_stack" {
 # Apply Argocd-ingress
 # -------------------------
 resource "null_resource" "apply_argocd_ingress" {
+  count = var.deploy_kubernetes_resources ? 1 : 0
   depends_on = [
     helm_release.argocd,        # wait for ArgoCD to be installed
     helm_release.nginx_ingress, # optional, ensures ingress controller exists
@@ -180,7 +188,7 @@ resource "null_resource" "apply_argocd_ingress" {
 
   provisioner "local-exec" {
     environment = {
-      KUBECONFIG = local_file.kubeconfig.filename
+      KUBECONFIG = local_file.kubeconfig[0].filename
     }
 
     command = "kubectl apply -f ${path.module}/argocd-ingress.yaml"

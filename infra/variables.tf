@@ -70,6 +70,12 @@ variable "eks_node_groups" {
   type        = map(any)
 }
 
+variable "deploy_kubernetes_resources" {
+  description = "Whether to create Kubernetes and Helm resources after the EKS cluster is ready"
+  type        = bool
+  default     = false
+}
+
 ############################################
 # RDS Database Settings
 ############################################

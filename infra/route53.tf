@@ -24,6 +24,7 @@ resource "aws_route53_zone" "r53_zone" {
 
 # Fetch the NGINX Ingress LoadBalancer service
 data "kubernetes_service" "nginx_ingress" {
+  count    = var.deploy_kubernetes_resources ? 1 : 0
   provider = kubernetes.post_eks # use the EKS provider alias
   metadata {
     name      = "nginx-ingress-${var.environment}-ingress-nginx-controller"
@@ -40,12 +41,13 @@ data "aws_lb_hosted_zone_id" "nginx_ingress" {
 
 # Route53 record for the root domain
 resource "aws_route53_record" "root" {
+  count   = var.deploy_kubernetes_resources ? 1 : 0
   zone_id = aws_route53_zone.r53_zone.zone_id
   name    = var.namecheap_domain
   type    = "A"
 
   alias {
-    name                   = data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname
+    name                   = data.kubernetes_service.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname
     zone_id                = data.aws_lb_hosted_zone_id.nginx_ingress.id
     evaluate_target_health = true
   }
@@ -55,33 +57,36 @@ resource "aws_route53_record" "root" {
 
 # Route53 record for "api" subdomain
 resource "aws_route53_record" "api" {
+  count   = var.deploy_kubernetes_resources ? 1 : 0
   zone_id = aws_route53_zone.r53_zone.zone_id
   name    = "api.${var.namecheap_domain}"
   type    = "CNAME"
   ttl     = 300
-  records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+  records = [data.kubernetes_service.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname]
 
   depends_on = [data.kubernetes_service.nginx_ingress]
 }
 
 # Route53 record for "argocd" subdomain
 resource "aws_route53_record" "argocd" {
+  count   = var.deploy_kubernetes_resources ? 1 : 0
   zone_id = aws_route53_zone.r53_zone.zone_id
   name    = "argocd.${var.namecheap_domain}"
   type    = "CNAME"
   ttl     = 300
-  records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+  records = [data.kubernetes_service.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname]
 
   depends_on = [data.kubernetes_service.nginx_ingress]
 }
 
 # Route53 record for Grafana, which is served by the shared NGINX ingress LB.
 resource "aws_route53_record" "grafana" {
+  count   = var.deploy_kubernetes_resources ? 1 : 0
   zone_id = aws_route53_zone.r53_zone.zone_id
   name    = "grafana.${var.namecheap_domain}"
   type    = "CNAME"
   ttl     = 300
-  records = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+  records = [data.kubernetes_service.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname]
 
   depends_on = [
     data.kubernetes_service.nginx_ingress,

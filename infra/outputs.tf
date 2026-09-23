@@ -34,7 +34,7 @@ output "rds_port" {
 
 output "rds_secret_name" {
   description = "Kubernetes secret name containing RDS credentials"
-  value       = kubernetes_secret.rds_credentials.metadata[0].name
+  value       = var.deploy_kubernetes_resources ? kubernetes_secret.rds_credentials[0].metadata[0].name : ""
 }
 
 # IRSA
@@ -45,18 +45,18 @@ output "irsa_role_arn" {
 
 output "rds_serviceaccount_name" {
   description = "ServiceAccount name in Kubernetes for RDS access"
-  value       = kubernetes_service_account.rds_access.metadata[0].name
+  value       = var.deploy_kubernetes_resources ? kubernetes_service_account.rds_access[0].metadata[0].name : ""
 }
 
 # Ingress / Cert-manager
 output "nginx_ingress_lb" {
   description = "Status of NGINX ingress helm release (use kubectl to inspect service)"
-  value       = helm_release.nginx_ingress.status
+  value       = var.deploy_kubernetes_resources ? helm_release.nginx_ingress[0].status : ""
 }
 
 output "cert_manager_status" {
   description = "Status of cert-manager helm release"
-  value       = helm_release.cert_manager.status
+  value       = var.deploy_kubernetes_resources ? helm_release.cert_manager[0].status : ""
 }
 
 # DNS
@@ -86,6 +86,6 @@ output "backend_ecr_url" {
 
 # R53 Records
 output "root_domain_full_record" {
-  value       = aws_route53_record.root
+  value       = var.deploy_kubernetes_resources ? aws_route53_record.root[0] : null
   description = "Full Route53 record object for the root domain"
 }

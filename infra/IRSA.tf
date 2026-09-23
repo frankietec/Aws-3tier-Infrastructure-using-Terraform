@@ -55,6 +55,7 @@ resource "aws_iam_role_policy_attachment" "attach_rds_policy" {
 ########################################################
 
 resource "kubernetes_service_account" "rds_access" {
+  count    = var.deploy_kubernetes_resources ? 1 : 0
   provider = kubernetes.post_eks # use alias
   metadata {
     name      = "rds-access"
@@ -71,6 +72,7 @@ resource "kubernetes_service_account" "rds_access" {
 ########################################################
 
 resource "kubernetes_secret" "rds_credentials" {
+  count    = var.deploy_kubernetes_resources ? 1 : 0
   provider = kubernetes.post_eks # use alias
   metadata {
     name      = "rds-credentials"

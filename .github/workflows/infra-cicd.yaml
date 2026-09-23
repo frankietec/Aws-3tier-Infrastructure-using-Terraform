@@ -41,22 +41,12 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
-        # with:
-        #   cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }} #Uncomment if you are using terraform cloud
 
       - name: Install tfsec for security scanning
         run: |
           curl -sLo tfsec https://github.com/aquasecurity/tfsec/releases/download/v1.28.11/tfsec-linux-amd64
           chmod +x tfsec
           ./tfsec --version
-
-
-      - name: Install kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
 
       - name: Terraform Init
         run: terraform init
@@ -79,8 +69,8 @@ jobs:
         run: ./tfsec .
         continue-on-error: true
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
+      - name: Terraform Plan (AWS + EKS only)
+        run: terraform plan -var='deploy_kubernetes_resources=false' -out=tfplan
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
@@ -119,8 +109,15 @@ jobs:
           name: terraform-plan
           path: infra
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply (AWS + EKS only)
+        run: terraform apply -auto-approve -var='deploy_kubernetes_resources=false' tfplan
+
+      - name: Update kubeconfig for the newly created EKS cluster
+        run: |
+          aws eks update-kubeconfig --name ${PROJECT_NAME}-${ENVIRONMENT}-cluster --region ${AWS_REGION}
+
+      - name: Terraform Apply (Kubernetes + Helm resources)
+        run: terraform apply -auto-approve -var='deploy_kubernetes_resources=true'
 
   destroy:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
@@ -148,4 +145,4 @@ jobs:
         run: terraform init
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: terraform destroy -auto-approve -var='deploy_kubernetes_resources=true'
