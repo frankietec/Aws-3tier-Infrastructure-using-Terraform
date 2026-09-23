@@ -36,8 +36,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-# These data sources are still required for generated kubeconfig and other EKS-aware resources.
-# They are not used in provider configuration, which avoids the Terraform cycle.
+# EKS data sources used to authenticate Terraform to the cluster without relying
+# on a local kubeconfig file.
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
 
@@ -50,22 +50,26 @@ data "aws_eks_cluster_auth" "cluster" {
   depends_on = [module.eks]
 }
 
-# Use the local kubeconfig for the EKS cluster instead of deriving the provider
-# endpoint from module.eks. This avoids a circular dependency between the EKS
-# module's aws-auth resources and the Kubernetes provider.
+# Default Kubernetes provider for cluster-aware resources.
 provider "kubernetes" {
-  config_path = pathexpand("~/.kube/config")
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-# Aliased Kubernetes Provider for post-EKS resources.
+# Aliased Kubernetes Provider for resources that need explicit provider references.
 provider "kubernetes" {
-  alias       = "post_eks"
-  config_path = pathexpand("~/.kube/config")
+  alias                  = "post_eks"
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-# Helm Provider using the same kubeconfig context.
+# Helm Provider using the EKS credentials.
 provider "helm" {
   kubernetes = {
-    config_path = pathexpand("~/.kube/config")
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
   }
 }
