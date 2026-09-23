@@ -51,24 +51,24 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 # Kubernetes and Helm credentials are intentionally injected via variables.
-# Using placeholder defaults keeps the Terraform graph acyclic during validate.
+# Using null defaults keeps the Terraform graph acyclic during validate and plan.
 provider "kubernetes" {
-  host                   = var.kubernetes_host != "" ? var.kubernetes_host : "https://127.0.0.1:6443"
-  cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? base64decode(var.kubernetes_cluster_ca_certificate) : base64decode("ZHVtbXk=")
-  token                  = var.kubernetes_token != "" ? var.kubernetes_token : "dummy-token"
+  host                   = var.kubernetes_host != "" ? var.kubernetes_host : null
+  cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? var.kubernetes_cluster_ca_certificate : null
+  token                  = var.kubernetes_token != "" ? var.kubernetes_token : null
 }
 
 provider "kubernetes" {
   alias                  = "post_eks"
-  host                   = var.kubernetes_host != "" ? var.kubernetes_host : "https://127.0.0.1:6443"
-  cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? base64decode(var.kubernetes_cluster_ca_certificate) : base64decode("ZHVtbXk=")
-  token                  = var.kubernetes_token != "" ? var.kubernetes_token : "dummy-token"
+  host                   = var.kubernetes_host != "" ? var.kubernetes_host : null
+  cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? var.kubernetes_cluster_ca_certificate : null
+  token                  = var.kubernetes_token != "" ? var.kubernetes_token : null
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = var.kubernetes_host != "" ? var.kubernetes_host : "https://127.0.0.1:6443"
-    cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? base64decode(var.kubernetes_cluster_ca_certificate) : base64decode("ZHVtbXk=")
-    token                  = var.kubernetes_token != "" ? var.kubernetes_token : "dummy-token"
+    host                   = var.kubernetes_host != "" ? var.kubernetes_host : null
+    cluster_ca_certificate = var.kubernetes_cluster_ca_certificate != "" ? var.kubernetes_cluster_ca_certificate : null
+    token                  = var.kubernetes_token != "" ? var.kubernetes_token : null
   }
 }
